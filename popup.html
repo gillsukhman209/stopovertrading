@@ -81,6 +81,50 @@
             font-size: 18px;
             text-align: center;
         }
+
+        #settings-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #block-duration {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
 </head>
 
@@ -90,8 +134,18 @@
     <div id="countdown"></div>
     <div class="button-container">
         <button id="block-websites">Block Trading Sites</button>
+        <button id="settings-button">Settings</button>
     </div>
     <div id="response-message"></div>
+
+    <div id="settings-modal">
+        <div class="modal-content">
+            <span class="close" id="close-settings">&times;</span>
+            <h2>Custom Block Time</h2>
+            <input type="number" id="block-duration" placeholder="Enter time in seconds">
+            <button id="save-settings">Save</button>
+        </div>
+    </div>
 
     <script src="popup.js"></script>
 </body>

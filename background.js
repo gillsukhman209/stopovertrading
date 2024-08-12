@@ -13,10 +13,11 @@ const blockedSites = [
 let isBlocking = false;
 let blockUntil = null;
 let blockTimer = null;
+let customBlockDuration = 15; // Default duration in seconds
 
-function getBlockEndTime() {
+function getBlockEndTime(duration) {
   const now = new Date();
-  return new Date(now.getTime() + 7.5 * 60 * 60 * 1000); // 7 hours and 30 minutes from now
+  return new Date(now.getTime() + duration * 1000);
 }
 
 function unblockSites() {
@@ -28,26 +29,31 @@ function unblockSites() {
 }
 
 // Load blocking state from storage when the extension starts
-chrome.storage.local.get(["isBlocking", "blockUntil"], (result) => {
-  isBlocking = result.isBlocking || false;
-  blockUntil = result.blockUntil ? new Date(result.blockUntil) : null;
+chrome.storage.local.get(
+  ["isBlocking", "blockUntil", "customBlockDuration"],
+  (result) => {
+    isBlocking = result.isBlocking || false;
+    blockUntil = result.blockUntil ? new Date(result.blockUntil) : null;
+    customBlockDuration = result.customBlockDuration || 15;
 
-  // Check if the block period has expired
-  if (isBlocking && blockUntil) {
-    const now = new Date();
-    if (now >= blockUntil) {
-      unblockSites();
-    } else {
-      const remainingTime = blockUntil.getTime() - now.getTime();
-      blockTimer = setTimeout(unblockSites, remainingTime);
+    // Check if the block period has expired
+    if (isBlocking && blockUntil) {
+      const now = new Date();
+      if (now >= blockUntil) {
+        unblockSites();
+      } else {
+        const remainingTime = blockUntil.getTime() - now.getTime();
+        blockTimer = setTimeout(unblockSites, remainingTime);
+      }
     }
   }
-});
+);
 
 function saveBlockingState() {
   chrome.storage.local.set({
     isBlocking: isBlocking,
     blockUntil: blockUntil ? blockUntil.toISOString() : null,
+    customBlockDuration: customBlockDuration,
   });
 }
 
@@ -91,19 +97,19 @@ function refreshAllTabs() {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "block_sites") {
     isBlocking = true;
-    blockUntil = getBlockEndTime();
+    blockUntil = getBlockEndTime(customBlockDuration);
     saveBlockingState();
 
     // Set a timer to unblock sites when the block period ends
     clearTimeout(blockTimer);
-    blockTimer = setTimeout(unblockSites, 15 * 1000); // 15 seconds
+    blockTimer = setTimeout(unblockSites, customBlockDuration * 1000);
 
     // Refresh all tabs to ensure blocked sites are closed
     refreshAllTabs();
 
     sendResponse({
       blocked: true,
-      message: "Sites blocked for the next 15 seconds",
+      message: `Sites blocked for the next ${customBlockDuration} seconds`,
       blockUntil: blockUntil.toISOString(),
     });
   } else if (request.action === "unblock_sites") {
@@ -123,6 +129,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       isBlocking: isBlocking,
       blockUntil: blockUntil ? blockUntil.toISOString() : null,
     });
+  } else if (request.action === "update_duration") {
+    customBlockDuration = request.duration;
+    saveBlockingState();
+    sendResponse({ message: "Block duration updated successfully" });
   }
   return true; // Indicates that the response is sent asynchronously
 });

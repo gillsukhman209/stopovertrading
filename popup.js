@@ -1,5 +1,6 @@
 let isBlocked = false;
 let blockEndTime = null;
+let customBlockDuration = 15; // Default duration in seconds
 
 function updateStatus() {
   const statusElement = document.getElementById("current-status");
@@ -54,6 +55,7 @@ function saveToLocalStorage(isBlocking, blockUntil) {
 function loadFromLocalStorage() {
   const storedIsBlocked = localStorage.getItem("isBlocked");
   const storedBlockEndTime = localStorage.getItem("blockEndTime");
+  const storedCustomBlockDuration = localStorage.getItem("customBlockDuration");
 
   if (storedIsBlocked !== null) {
     isBlocked = JSON.parse(storedIsBlocked);
@@ -62,6 +64,10 @@ function loadFromLocalStorage() {
   if (storedBlockEndTime !== null) {
     blockEndTime = JSON.parse(storedBlockEndTime);
   }
+
+  if (storedCustomBlockDuration !== null) {
+    customBlockDuration = JSON.parse(storedCustomBlockDuration);
+  }
 }
 
 document
@@ -69,7 +75,7 @@ document
   .addEventListener("click", function () {
     if (!isBlocked) {
       chrome.runtime.sendMessage(
-        { action: "block_sites" },
+        { action: "block_sites", duration: customBlockDuration },
         function (response) {
           if (response.blocked) {
             saveToLocalStorage(true, response.blockUntil);
@@ -80,6 +86,40 @@ document
         }
       );
     }
+  });
+
+document
+  .getElementById("settings-button")
+  .addEventListener("click", function () {
+    const modal = document.getElementById("settings-modal");
+    modal.style.display = "block";
+  });
+
+document.getElementById("save-settings").addEventListener("click", function () {
+  const durationInput = document.getElementById("block-duration");
+  const newDuration = parseInt(durationInput.value, 10);
+  if (!isNaN(newDuration) && newDuration > 0) {
+    customBlockDuration = newDuration;
+    localStorage.setItem("customBlockDuration", JSON.stringify(newDuration));
+    const modal = document.getElementById("settings-modal");
+    modal.style.display = "none";
+    // Add a confirmation message
+    showResponse({ message: "Settings saved successfully!", blocked: true });
+    // Update the background script with the new duration
+    chrome.runtime.sendMessage({
+      action: "update_duration",
+      duration: newDuration,
+    });
+  } else {
+    alert("Please enter a valid positive number for the duration.");
+  }
+});
+
+document
+  .getElementById("close-settings")
+  .addEventListener("click", function () {
+    const modal = document.getElementById("settings-modal");
+    modal.style.display = "none";
   });
 
 // Initial status update
