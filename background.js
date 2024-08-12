@@ -1,6 +1,6 @@
 self.importScripts("ExtPay.js");
 
-const extpay = ExtPay("stop-overtrading");
+const extpay = ExtPay("stop-trading");
 
 extpay.startBackground();
 
@@ -92,11 +92,11 @@ function checkAndBlockTab(tab) {
   }
 }
 
-function refreshAllTabs() {
-  chrome.tabs.query({}, (tabs) => {
-    tabs.forEach((tab) => {
-      chrome.tabs.reload(tab.id);
-    });
+function refreshCurrentTab() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]) {
+      chrome.tabs.reload(tabs[0].id);
+    }
   });
 }
 
@@ -112,7 +112,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     blockTimer = setTimeout(unblockSites, customBlockDuration * 1000);
 
     // Refresh all tabs to ensure blocked sites are closed
-    refreshAllTabs();
+    refreshCurrentTab();
 
     const hours = Math.floor(customBlockDuration / 3600);
     const minutes = Math.floor((customBlockDuration % 3600) / 60);

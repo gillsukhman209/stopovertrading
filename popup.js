@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   try {
-    var extpay = ExtPay("stop-overtrading");
+    var extpay = ExtPay("stop-trading");
     let isBlocked = false;
     let blockEndTime = null;
     let customBlockDuration = 60 * 60; // Default duration in seconds (1 hour)
