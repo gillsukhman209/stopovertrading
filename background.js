@@ -4,6 +4,8 @@ const blockedSites = [
   "https://topstepx.com",
   "https://ninjatrader.com/",
   "https://www.quantower.com",
+  "https://www.sierrachart.com",
+  "https://www.rithmic.com/rtraderpro",
   "trading",
   "extensions",
 ];
