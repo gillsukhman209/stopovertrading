@@ -8,5 +8,11 @@
   },
   "action": {
     "default_popup": "popup.html"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["ExtPay.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

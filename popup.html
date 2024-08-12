@@ -118,23 +118,31 @@
             cursor: pointer;
         }
 
-        #block-duration {
+        .duration-input {
             width: 100%;
             padding: 10px;
             margin-top: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+
+        #paid-status {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
     <h1>Stop Overtrading</h1>
+    <div id="paid-status"></div>
     <div id="status">Current Status: <span id="current-status">Unblocked</span></div>
     <div id="countdown"></div>
     <div class="button-container">
         <button id="block-websites">Block Trading Sites</button>
         <button id="settings-button">Settings</button>
+        <button id="manage-subscription" style="display: none;">Manage Subscription</button>
     </div>
     <div id="response-message"></div>
 
@@ -142,11 +150,13 @@
         <div class="modal-content">
             <span class="close" id="close-settings">&times;</span>
             <h2>Custom Block Time</h2>
-            <input type="number" id="block-duration" placeholder="Enter time in seconds">
+            <input type="number" id="block-duration-hours" class="duration-input" placeholder="Enter hours">
+            <input type="number" id="block-duration-minutes" class="duration-input" placeholder="Enter minutes">
             <button id="save-settings">Save</button>
         </div>
     </div>
 
+    <script src="ExtPay.js"></script>
     <script src="popup.js"></script>
 </body>
 

@@ -1,3 +1,9 @@
+self.importScripts("ExtPay.js");
+
+const extpay = ExtPay("stop-overtrading");
+
+extpay.startBackground();
+
 const blockedSites = [
   "https://www.tradingview.com/chart/",
   "https://trader.tradovate.com/",
@@ -13,7 +19,7 @@ const blockedSites = [
 let isBlocking = false;
 let blockUntil = null;
 let blockTimer = null;
-let customBlockDuration = 15; // Default duration in seconds
+let customBlockDuration = 15 * 60; // Default duration in seconds (15 minutes)
 
 function getBlockEndTime(duration) {
   const now = new Date();
@@ -34,7 +40,7 @@ chrome.storage.local.get(
   (result) => {
     isBlocking = result.isBlocking || false;
     blockUntil = result.blockUntil ? new Date(result.blockUntil) : null;
-    customBlockDuration = result.customBlockDuration || 15;
+    customBlockDuration = result.customBlockDuration || 15 * 60;
 
     // Check if the block period has expired
     if (isBlocking && blockUntil) {
@@ -96,6 +102,7 @@ function refreshAllTabs() {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "block_sites") {
+    console.log(request);
     isBlocking = true;
     blockUntil = getBlockEndTime(customBlockDuration);
     saveBlockingState();
@@ -107,9 +114,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Refresh all tabs to ensure blocked sites are closed
     refreshAllTabs();
 
+    const hours = Math.floor(customBlockDuration / 3600);
+    const minutes = Math.floor((customBlockDuration % 3600) / 60);
+    const timeString =
+      hours > 0
+        ? `${hours} hours and ${minutes} minutes`
+        : `${minutes} minutes`;
+
     sendResponse({
       blocked: true,
-      message: `Sites blocked for the next ${customBlockDuration} seconds`,
+      message: `Sites blocked for the next ${timeString}`,
       blockUntil: blockUntil.toISOString(),
     });
   } else if (request.action === "unblock_sites") {
@@ -132,7 +146,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === "update_duration") {
     customBlockDuration = request.duration;
     saveBlockingState();
-    sendResponse({ message: "Block duration updated successfully" });
+    sendResponse({
+      message: "Block duration updated successfully",
+    });
   }
   return true; // Indicates that the response is sent asynchronously
 });
