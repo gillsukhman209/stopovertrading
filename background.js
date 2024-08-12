@@ -31,7 +31,7 @@ function unblockSites() {
   blockUntil = null;
   saveBlockingState();
   clearTimeout(blockTimer);
-  refreshAllTabs();
+  refreshCurrentTab();
 }
 
 // Load blocking state from storage when the extension starts

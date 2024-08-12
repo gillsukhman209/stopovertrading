@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Trade Blocker",
+  "name": "Stop Trading",
   "version": "1.0",
   "permissions": ["tabs", "storage"],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "logo2.png"
   },
   "web_accessible_resources": [
     {
