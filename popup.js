@@ -96,11 +96,8 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
           const blockButton = document.getElementById("block-websites");
           const countdownElement = document.getElementById("countdown");
-          const manageSubscriptionButton = document.getElementById(
-            "manage-subscription"
-          );
 
-          if (!blockButton || !countdownElement || !manageSubscriptionButton) {
+          if (!blockButton || !countdownElement) {
             throw new Error("Button elements not found");
           }
 
@@ -127,9 +124,6 @@ document.addEventListener("DOMContentLoaded", function () {
             blockButton.disabled = false; // Enable button for all users
             blockButton.style.opacity = "1";
           }
-
-          // Show manage subscription button for all users
-          manageSubscriptionButton.style.display = "block";
         } catch (error) {
           console.error("Error in updateButtonStates:", error);
         }
@@ -334,22 +328,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       } else {
         console.error("Close settings button not found");
-      }
-
-      // Add event listener for manage subscription button
-      const manageSubscriptionButton = document.getElementById(
-        "manage-subscription"
-      );
-      if (manageSubscriptionButton) {
-        manageSubscriptionButton.addEventListener("click", function () {
-          try {
-            extpay.openPaymentPage();
-          } catch (error) {
-            console.error("Error opening payment page:", error);
-          }
-        });
-      } else {
-        console.error("Manage subscription button not found");
       }
 
       // Initial status update
