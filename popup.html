@@ -5,10 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade Blocker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #6366F1;
+            --background-color: #F9FAFB;
+            --text-color: #1F2937;
+            --success-color: #10B981;
+            --error-color: #EF4444;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f4f8;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -17,69 +27,79 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            width: 300px;
+            width: 350px;
+            color: var(--text-color);
         }
 
         h1 {
-            color: #2c3e50;
+            color: var(--primary-color);
             margin-bottom: 30px;
             text-align: center;
-            font-size: 24px;
+            font-size: 32px;
+            font-weight: 700;
             width: 100%;
         }
 
         .button-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
         }
 
         button {
-            background-color: #3498db;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 14px 24px;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             font-size: 16px;
+            font-weight: 500;
             width: 100%;
             white-space: nowrap;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.1);
         }
 
         button:hover {
-            background-color: #2980b9;
+            background-color: var(--secondary-color);
+            box-shadow: 0 6px 10px rgba(79, 70, 229, 0.2);
+            transform: translateY(-2px);
         }
 
         #response-message {
             margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 14px;
+            border-radius: 8px;
             text-align: center;
-            font-weight: bold;
+            font-weight: 500;
+            font-size: 14px;
         }
 
         .success {
-            background-color: #2ecc71;
-            color: white;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
         }
 
         .error {
-            background-color: #e74c3c;
-            color: white;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
         }
 
         #status {
             margin-top: 20px;
-            font-weight: bold;
+            font-weight: 500;
             text-align: center;
+            font-size: 16px;
         }
 
         #countdown {
             margin-top: 10px;
-            font-size: 18px;
+            font-size: 24px;
             text-align: center;
+            font-weight: 700;
+            color: var(--primary-color);
         }
 
         #settings-modal {
@@ -91,45 +111,56 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
-            background-color: #fefefe;
+            background-color: #ffffff;
             margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
+            padding: 30px;
+            border: none;
             width: 80%;
-            border-radius: 8px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         .close {
-            color: #aaa;
+            color: var(--text-color);
             float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            transition: color 0.3s ease;
         }
 
         .close:hover,
         .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
+            color: var(--primary-color);
         }
 
         .duration-input {
             width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 14px;
+            margin-top: 15px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .duration-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
         #paid-status {
-            margin-top: 10px;
-            font-weight: bold;
+            margin-top: 15px;
+            font-weight: 500;
             text-align: center;
+            font-size: 14px;
+            color: var(--primary-color);
         }
     </style>
 </head>
@@ -142,7 +173,6 @@
     <div class="button-container">
         <button id="block-websites">Block Trading Sites</button>
         <button id="settings-button">Settings</button>
-
     </div>
     <div id="response-message"></div>
 
