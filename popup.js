@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let blockEndTime = null;
     let customBlockDuration = 60 * 60; // Default duration in seconds (1 hour)
     let userIsPaid = false;
+    let countdownInterval; // New variable to store the interval ID
 
     // Check user's payment status once when popup is opened
     extpay
@@ -82,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 isBlocked = actuallyBlocked;
                 blockEndTime = response.blockUntil;
                 updateButtonStates(); // Update button states after getting blocking status
+                startCountdown(); // Start the countdown timer
               } else {
                 console.error("No response received from background script");
               }
@@ -102,21 +104,6 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           if (isBlocked && blockEndTime) {
-            const remainingTime = Math.max(
-              0,
-              new Date(blockEndTime) - Date.now()
-            );
-            const hours = Math.floor(remainingTime / (60 * 60 * 1000));
-            const minutes = Math.floor(
-              (remainingTime % (60 * 60 * 1000)) / (60 * 1000)
-            );
-            const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
-
-            countdownElement.textContent = `${hours
-              .toString()
-              .padStart(2, "0")}:${minutes
-              .toString()
-              .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
             blockButton.disabled = true;
             blockButton.style.opacity = "0.5";
           } else {
@@ -126,6 +113,41 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         } catch (error) {
           console.error("Error in updateButtonStates:", error);
+        }
+      }
+
+      function startCountdown() {
+        clearInterval(countdownInterval); // Clear any existing interval
+        const countdownElement = document.getElementById("countdown");
+
+        if (isBlocked && blockEndTime) {
+          countdownInterval = setInterval(() => {
+            const remainingTime = Math.max(
+              0,
+              new Date(blockEndTime) - Date.now()
+            );
+
+            if (remainingTime <= 0) {
+              clearInterval(countdownInterval);
+              isBlocked = false;
+              blockEndTime = null;
+              updateStatus();
+            } else {
+              const hours = Math.floor(remainingTime / (60 * 60 * 1000));
+              const minutes = Math.floor(
+                (remainingTime % (60 * 60 * 1000)) / (60 * 1000)
+              );
+              const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
+
+              countdownElement.textContent = `${hours
+                .toString()
+                .padStart(2, "0")}:${minutes
+                .toString()
+                .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+            }
+          }, 1000); // Update every second
+        } else {
+          countdownElement.textContent = "";
         }
       }
 
@@ -207,6 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     updateStatus();
                     updateButtonStates();
                     showResponse(response);
+                    startCountdown(); // Start the countdown timer
                   } else {
                     console.error("Invalid response or blocking failed");
                     console.log("Full response:", response); // Log the full response
@@ -352,6 +375,7 @@ document.addEventListener("DOMContentLoaded", function () {
         loadFromLocalStorage();
         updateStatus();
         updateButtonStates();
+        startCountdown(); // Start the countdown timer on initial load
       } catch (error) {
         console.error("Error in initial status update:", error);
       }
