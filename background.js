@@ -31,7 +31,6 @@ function unblockSites() {
   blockUntil = null;
   saveBlockingState();
   clearTimeout(blockTimer);
-  refreshCurrentTab();
 }
 
 // Load blocking state from storage when the extension starts
@@ -111,7 +110,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     clearTimeout(blockTimer);
     blockTimer = setTimeout(unblockSites, customBlockDuration * 1000);
 
-    // Refresh all tabs to ensure blocked sites are closed
     refreshCurrentTab();
 
     const hours = Math.floor(customBlockDuration / 3600);
