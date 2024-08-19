@@ -259,9 +259,12 @@ document.addEventListener("DOMContentLoaded", function () {
             const minutesInput = document.getElementById(
               "block-duration-minutes"
             );
+            const customWebsiteInput =
+              document.getElementById("custom-website");
             const hours = parseInt(hoursInput.value, 10) || 0;
             const minutes = parseInt(minutesInput.value, 10) || 0;
             const newDuration = (hours * 60 + minutes) * 60; // Convert to seconds
+            const customWebsite = customWebsiteInput.value.trim();
 
             if (newDuration > 0) {
               customBlockDuration = newDuration;
@@ -269,15 +272,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 "customBlockDuration",
                 JSON.stringify(newDuration)
               );
-              const modal = document.getElementById("settings-modal");
-              if (modal) {
-                modal.style.display = "none";
-              }
-              // Add a confirmation message
-              showResponse({
-                message: "Settings saved successfully!",
-                blocked: true,
-              });
               // Update the background script with the new duration
               chrome.runtime.sendMessage(
                 {
@@ -293,11 +287,34 @@ document.addEventListener("DOMContentLoaded", function () {
                   updateStatus();
                 }
               );
-            } else {
-              alert(
-                "Please enter a valid positive number for hours or minutes."
+            }
+
+            if (customWebsite) {
+              // Send message to background.js to add the custom website
+              chrome.runtime.sendMessage(
+                {
+                  action: "add_custom_website",
+                  website: customWebsite,
+                },
+                function (response) {
+                  if (chrome.runtime.lastError) {
+                    console.error("Runtime error:", chrome.runtime.lastError);
+                    return;
+                  }
+                  console.log("Custom website added:", response);
+                }
               );
             }
+
+            const modal = document.getElementById("settings-modal");
+            if (modal) {
+              modal.style.display = "none";
+            }
+            // Add a confirmation message
+            showResponse({
+              message: "Settings saved successfully!",
+              blocked: true,
+            });
           } catch (error) {
             console.error(
               "Error in save settings button click handler:",

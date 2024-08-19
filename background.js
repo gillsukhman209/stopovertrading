@@ -35,11 +35,14 @@ function unblockSites() {
 
 // Load blocking state from storage when the extension starts
 chrome.storage.local.get(
-  ["isBlocking", "blockUntil", "customBlockDuration"],
+  ["isBlocking", "blockUntil", "customBlockDuration", "customBlockedSites"],
   (result) => {
     isBlocking = result.isBlocking || false;
     blockUntil = result.blockUntil ? new Date(result.blockUntil) : null;
     customBlockDuration = result.customBlockDuration || 15 * 60;
+    if (result.customBlockedSites) {
+      blockedSites.push(...result.customBlockedSites);
+    }
 
     // Check if the block period has expired
     if (isBlocking && blockUntil) {
@@ -59,6 +62,7 @@ function saveBlockingState() {
     isBlocking: isBlocking,
     blockUntil: blockUntil ? blockUntil.toISOString() : null,
     customBlockDuration: customBlockDuration,
+    customBlockedSites: blockedSites.slice(9), // Save only custom sites
   });
 }
 
@@ -146,6 +150,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     saveBlockingState();
     sendResponse({
       message: "Block duration updated successfully",
+    });
+  } else if (request.action === "add_custom_website") {
+    blockedSites.push(request.website);
+    saveBlockingState();
+    sendResponse({
+      message: "Custom website added successfully",
+      blockedSites: blockedSites,
     });
   }
   return true; // Indicates that the response is sent asynchronously
