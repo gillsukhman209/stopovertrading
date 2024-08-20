@@ -31,13 +31,9 @@ document.addEventListener("DOMContentLoaded", function () {
           } else {
             extpay.openPaymentPage();
           }
-        } catch (error) {
-          console.error("Error in extpay.getUser() callback:", error);
-        }
+        } catch (error) {}
       })
-      .catch((error) => {
-        console.error("Error getting user payment status:", error);
-      });
+      .catch((error) => {});
 
     chrome.storage.local.get(["userIsPaid"], function (result) {
       if (chrome.runtime.lastError) {
